@@ -6,20 +6,41 @@ import Text.Parsec
 import Text.Parsec.Char
 import Text.Parsec.String
 
+{-
+see romkan.csv
+-}
+
 boin :: Parser Char
 boin = oneOf "aiueo"
 
-siin1 :: Parser Char
-siin1 = oneOf "kstnhmrgzdbpv"
+siinY :: Parser Char
+siinY = oneOf "bfghjklmprvz"
 
--- yagyou = char "y" >> oneOf "auo"
--- 
--- siin1w = char "w" >> oneOf "aieo"
--- 
--- mojin = char "nn" <|> char "n'" <|> char "xn"
+siinYH :: Parser Char
+siinYH = oneOf "cdsw"
+
+siinYHS :: Parser Char
+siinYHS = char 't'
+
+optionY :: Parser Char
+optionY = char 'y'
+
+optionYH :: Parser Char
+optionYH = oneOf "yh"
+
+optionYHS :: Parser Char
+optionYHS = oneOf "yhs"
+
 
 romaji_char :: Parser Char
-romaji_char = optional siin1 >> boin
+romaji_char = ((char 'y' >> oneOf "aieo")
+               <|> (char 'q' >> boin)
+               <|> (siinY    >> optional optionY   >> boin)
+               <|> (siinYH   >> optional optionYH  >> boin)
+               <|> (siinYHS  >> optional optionYHS >> boin)
+               <|> (char 'x' >> (char 'n' <|> (optional optionY >> boin)))
+               <|> (char 'n' >> (char 'n' <|> (optional optionY >> boin) <|> lookAhead (noneOf "aiueoyn")))
+               <|> boin)
 
 romaji_str :: Parser String
 romaji_str = many romaji_char
