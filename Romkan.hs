@@ -10,6 +10,90 @@ import Text.Parsec.String
 see romkan.csv
 -}
 
+listHiraKana =
+  [
+    "あいうえお",
+    "かきくけこ",
+    "さしすせそ",
+    "たちつてと",
+    "なにぬねの",
+    "はひふへほ",
+    "まみむめも",
+    "やいゆえよ",
+    "らりるれろ",
+    "わゐうゑを",
+    "がぎぐげご",
+    "ざじずぜぞ",
+    "だぢづでど",
+    "ばびぶべぼ",
+    "ぱぴぷぺぽ"
+  ]
+
+
+data Vowel = VowelA | VowelI | VowelU | VowelE | VowelO
+
+
+getVowelOrder x =
+  case x of
+    VowelA -> 0
+    VowelI -> 1
+    VowelU -> 2
+    VowelE -> 3
+    VowelO -> 4
+
+
+data Consonant =
+  ConsonantNone
+  | ConsonantK
+  | ConsonantS
+  | ConsonantT
+  | ConsonantN
+  | ConsonantH
+  | ConsonantM
+  | ConsonantY
+  | ConsonantR
+  | ConsonantW
+  | ConsonantG
+  | ConsonantZ
+  | ConsonantD
+  | ConsonantB
+  | ConsonantP
+  | ConsonantC -- begin of irregular consonant
+  | ConsonantF
+  | ConsonantJ
+  | ConsonantL -- not consonant?
+  | ConsonantQ
+  | ConsonantV
+  | ConsonantX
+
+
+getConsonantOrder :: Consonant -> Int
+getConsonantOrder x =
+  case x of
+    ConsonantNone -> 0
+    ConsonantK -> 1
+    ConsonantS -> 2
+    ConsonantT -> 3
+    ConsonantN -> 4
+    ConsonantH -> 5
+    ConsonantM -> 6
+    ConsonantY -> 7
+    ConsonantR -> 8
+    ConsonantW -> 9
+    ConsonantG -> 10
+    ConsonantZ -> 11
+    ConsonantD -> 12
+    ConsonantB -> 13
+    ConsonantP -> 14
+
+
+getHiraKana :: Consonant -> Vowel -> Char
+getHiraKana c v = (listHiraKana !! getConsonantOrder c) !! getVowelOrder v
+
+toHiraKanaChars :: Maybe Char -> Consonant -> Vowel -> String
+toHiraKanaChars Nothing c v = [getHiraKana c v]
+
+
 boin :: Parser Char
 boin = oneOf "aiueo"
 
