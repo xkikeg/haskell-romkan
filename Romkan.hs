@@ -97,6 +97,9 @@ toHiraKanaChars Nothing c v = [getHiraKana c v]
 boin :: Parser Char
 boin = oneOf "aiueo"
 
+siin :: Parser Char
+siin = noneOf "aiueo"
+
 siinY :: Parser Char
 siinY = oneOf "bfghjklmprvz"
 
@@ -116,15 +119,28 @@ optionYHS :: Parser Char
 optionYHS = oneOf "yhs"
 
 
+romaji_char_wo_xtu :: Parser Char
+romaji_char_wo_xtu =
+  (char 'y' >> oneOf "aieo")
+  <|> (char 'q' >> boin)
+  <|> (siinY    >> optional optionY   >> boin)
+  <|> (siinYH   >> optional optionYH  >> boin)
+  <|> (siinYHS  >> optional optionYHS >> boin)
+  <|> (char 'x' >> (char 'n' <|> (optional optionY >> boin)))
+  <|> (char 'n' >> (char 'n' <|> (eof >> return 'n')
+                    <|> (lookAhead (noneOf "aiueoyn") >> return 'n')
+                    <|> (optional optionY >> boin)))
+  <|> boin
+
+
 romaji_char :: Parser Char
-romaji_char = ((char 'y' >> oneOf "aieo")
-               <|> (char 'q' >> boin)
-               <|> (siinY    >> optional optionY   >> boin)
-               <|> (siinYH   >> optional optionYH  >> boin)
-               <|> (siinYHS  >> optional optionYHS >> boin)
-               <|> (char 'x' >> (char 'n' <|> (optional optionY >> boin)))
-               <|> (char 'n' >> (char 'n' <|> (optional optionY >> boin) <|> lookAhead (noneOf "aiueoyn")))
-               <|> boin)
+romaji_char =
+  try (do
+          c <- siin
+          lookAhead $ char c
+          romaji_char_wo_xtu)
+  <|> romaji_char_wo_xtu
+
 
 romaji_str :: Parser String
 romaji_str = many romaji_char
