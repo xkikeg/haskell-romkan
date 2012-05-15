@@ -12,14 +12,19 @@ hirakanaTest cs vs = concatMap f $ prod cs vs
 
 allVowel = [VowelA, VowelI, VowelU, VowelE, VowelO]
 
+myparseTest p s = case parse p "test" s of
+  Left err -> print err
+  Right xs -> putStrLn xs
+
 main = do
   putStrLn $ hirakanaTest [ConsonantNone, ConsonantP, ConsonantW] allVowel
-  parseTest romaji_str "aiueo"
-  parseTest romaji_str "kakikukeko"
-  parseTest romaji_str "akasatanahamayarawa"
-  parseTest romaji_str "naninuneno"
-  parseTest romaji_str "koxnnichiwa"
-  parseTest romaji_str "toukyotokkyokyokakyoku"
-  parseTest romaji_str "annan"
-  parseTest romaji_str "antabaka"
-  parseTest romaji_str "sapporo"
+  myparseTest romaji_to_kana "aiueo"
+  myparseTest romaji_to_kana "kakikukeko"
+  myparseTest romaji_to_kana "akasatanahamayarawa"
+  myparseTest romaji_to_kana "naninuneno"
+  myparseTest romaji_to_kana "koxnnichiwa"
+  myparseTest romaji_to_kana "toukyoutokkyokyokakyoku"
+  myparseTest romaji_to_kana "annan"
+  myparseTest romaji_to_kana "antabaka"
+  myparseTest romaji_to_kana "sapporo"
+  myparseTest romaji_to_kana "damm"
