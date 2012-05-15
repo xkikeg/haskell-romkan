@@ -4,7 +4,10 @@ Haskell/Romkan
 About
 -----
 Haskell Japanese romaji and kana conversion library with Parsec.
-まだ実用不可能ですので使用しないか完成させてください。
+
+Usage
+-----
+See test.hs to know usage.
 
 Reference
 ---------
