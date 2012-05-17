@@ -65,6 +65,10 @@ data Consonant =
   deriving (Show, Read, Enum)
 
 
+vowelIndex :: Vowel -> ([a] -> a)
+vowelIndex v = (!! fromEnum v)
+
+
 getConsonantOrder :: Consonant -> Int
 getConsonantOrder x =
   case x of
@@ -74,8 +78,31 @@ getConsonantOrder x =
     _ -> fromEnum x
 
 
-vowelIndex :: Vowel -> ([a] -> a)
-vowelIndex v = (!! fromEnum v)
+toVowel :: Char -> Vowel
+toVowel 'a' = VowelA
+toVowel 'i' = VowelI
+toVowel 'u' = VowelU
+toVowel 'e' = VowelE
+toVowel 'o' = VowelO
+
+
+toConsonant :: Char -> Consonant
+toConsonant 'c' = ConsonantC
+toConsonant 'd' = ConsonantD
+toConsonant 's' = ConsonantS
+toConsonant 'w' = ConsonantW
+toConsonant 'b' = ConsonantB
+toConsonant 'f' = ConsonantF
+toConsonant 'g' = ConsonantG
+toConsonant 'h' = ConsonantH
+toConsonant 'j' = ConsonantJ
+toConsonant 'k' = ConsonantK
+toConsonant 'l' = ConsonantL
+toConsonant 'm' = ConsonantM
+toConsonant 'p' = ConsonantP
+toConsonant 'r' = ConsonantR
+toConsonant 'v' = ConsonantV
+toConsonant 'z' = ConsonantZ
 
 
 getHiraKana :: Consonant -> Vowel -> String
@@ -112,37 +139,16 @@ toHiraKanaChars (Just ConsonantY) c v =
 
 
 boin :: Parser Vowel
-boin = oneOf "aiueo" >>= f
-  where f 'a' = return VowelA
-        f 'i' = return VowelI
-        f 'u' = return VowelU
-        f 'e' = return VowelE
-        f 'o' = return VowelO
+boin = toVowel <$> oneOf "aiueo"
 
 siin :: Parser Char
 siin = noneOf "aiueon"
 
 siinY :: Parser Consonant
-siinY = oneOf "bfghjklmprvz" >>= f
-  where f 'b' = return ConsonantB
-        f 'f' = return ConsonantF
-        f 'g' = return ConsonantG
-        f 'h' = return ConsonantH
-        f 'j' = return ConsonantJ
-        f 'k' = return ConsonantK
-        f 'l' = return ConsonantL
-        f 'm' = return ConsonantM
-        f 'p' = return ConsonantP
-        f 'r' = return ConsonantR
-        f 'v' = return ConsonantV
-        f 'z' = return ConsonantZ
+siinY = toConsonant <$> oneOf "bfghjklmprvz"
 
 siinYH :: Parser Consonant
-siinYH = oneOf "cdsw" >>= f
-  where f 'c' = return ConsonantC
-        f 'd' = return ConsonantD
-        f 's' = return ConsonantS
-        f 'w' = return ConsonantW
+siinYH = toConsonant <$> oneOf "cdsw"
 
 siinYHS :: Parser Consonant
 siinYHS = char 't' >> return ConsonantT
