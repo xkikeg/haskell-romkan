@@ -6,6 +6,7 @@ import Data.List
 import Text.Parsec
 import Text.Parsec.Char
 import Text.Parsec.String
+import Control.Applicative hiding ((<|>), many)
 
 {-
 see romkan.csv
@@ -158,33 +159,24 @@ optionYHS = optionYH <|> (char 's' >> return ConsonantS)
 
 romaji_char_wo_xtu :: Parser String
 romaji_char_wo_xtu =
-  do
-    char 'y'
-    v <- boin
-    return $ toHiraKanaChars Nothing ConsonantY v
+  (char 'y' >> (fmap $ toHiraKanaChars Nothing ConsonantY) boin)
   <|>
-  do
-    char 'q'
-    v <- boin
-    return $ toHiraKanaChars Nothing ConsonantQ v
+  (char 'q' >> toHiraKanaChars Nothing ConsonantQ <$> boin)
   <|>
   do
     c <- siinY
     o <- optionMaybe optionY
-    v <- boin
-    return $ toHiraKanaChars o c v
+    toHiraKanaChars o c <$> boin
   <|>
   do
     c <- siinYH
     o <- optionMaybe optionYH
-    v <- boin
-    return $ toHiraKanaChars o c v
+    toHiraKanaChars o c <$> boin
   <|>
   do
     c <- siinYHS
     o <- optionMaybe optionYHS
-    v <- boin
-    return $ toHiraKanaChars o c v
+    toHiraKanaChars o c <$> boin
   <|> 
   do
     char 'x'
@@ -192,8 +184,7 @@ romaji_char_wo_xtu =
       <|> 
       do
         o <- optionMaybe optionY 
-        v <- boin
-        return $ toHiraKanaChars o ConsonantX v
+        toHiraKanaChars o ConsonantX <$> boin
   <|>
   do
     char 'n'
@@ -203,25 +194,19 @@ romaji_char_wo_xtu =
       <|>
       do
         o <- optionMaybe optionY
-        v <- boin
-        return $ toHiraKanaChars o ConsonantN v
+        toHiraKanaChars o ConsonantN <$> boin
   <|>
-  do
-    v <- boin
-    return $ toHiraKanaChars Nothing ConsonantNone v
+  toHiraKanaChars Nothing ConsonantNone <$> boin
 
 romaji_char :: Parser String
 romaji_char =
   try (do
           c <- siin
-          lookAhead $ char c
-          x <- romaji_char_wo_xtu
-          return $ 'っ' : x
+          (lookAhead . char) c
+          ('っ' :) <$> romaji_char_wo_xtu
       )
   <|> romaji_char_wo_xtu
 
 
 romaji_to_kana :: Parser String
-romaji_to_kana = do
-  x <- many romaji_char
-  return $ concat x
+romaji_to_kana = concat <$> many romaji_char
