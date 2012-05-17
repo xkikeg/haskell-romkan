@@ -34,15 +34,7 @@ listHiraKana =
 
 
 data Vowel = VowelA | VowelI | VowelU | VowelE | VowelO
-
-
-getVowelOrder x =
-  case x of
-    VowelA -> 0
-    VowelI -> 1
-    VowelU -> 2
-    VowelE -> 3
-    VowelO -> 4
+  deriving (Show, Read, Enum)
 
 
 data Consonant =
@@ -69,57 +61,48 @@ data Consonant =
   | ConsonantV
   | ConsonantX
   | ConsonantLittleY
+  deriving (Show, Read, Enum)
 
 
 getConsonantOrder :: Consonant -> Int
 getConsonantOrder x =
   case x of
-    ConsonantNone -> 0
-    ConsonantK -> 1
-    ConsonantS -> 2
-    ConsonantT -> 3
-    ConsonantN -> 4
-    ConsonantH -> 5
-    ConsonantM -> 6
-    ConsonantY -> 7
-    ConsonantR -> 8
-    ConsonantW -> 9
-    ConsonantG -> 10
-    ConsonantZ -> 11
-    ConsonantD -> 12
-    ConsonantB -> 13
-    ConsonantP -> 14
     ConsonantL -> 15
     ConsonantX -> 15
     ConsonantLittleY -> 16
+    _ -> fromEnum x
+
+
+vowelIndex :: Vowel -> ([a] -> a)
+vowelIndex v = (!! fromEnum v)
 
 
 getHiraKana :: Consonant -> Vowel -> String
 getHiraKana c v =
   case c of
-    ConsonantF -> ["ふぁ", "ふぃ", "ふ", "ふぇ", "ふぉ"] !! getVowelOrder v
-    ConsonantJ -> ["じゃ", "じ", "じゅ", "じぇ", "じょ"] !! getVowelOrder v
-    ConsonantQ -> ["くぁ", "くぃ", "く", "くぇ", "くぉ"] !! getVowelOrder v
-    ConsonantV -> ["ゔぁ", "ゔぃ", "ゔ", "ゔぇ", "ゔぉ"] !! getVowelOrder v
-    _ -> [(listHiraKana !! getConsonantOrder c) !! getVowelOrder v]
+    ConsonantF -> vowelIndex v ["ふぁ", "ふぃ", "ふ", "ふぇ", "ふぉ"]
+    ConsonantJ -> vowelIndex v ["じゃ", "じ", "じゅ", "じぇ", "じょ"]
+    ConsonantQ -> vowelIndex v ["くぁ", "くぃ", "く", "くぇ", "くぉ"]
+    ConsonantV -> vowelIndex v ["ゔぁ", "ゔぃ", "ゔ", "ゔぇ", "ゔぉ"]
+    _ -> [vowelIndex v (listHiraKana !! getConsonantOrder c)]
 
 toHiraKanaChars :: Maybe Consonant -> Consonant -> Vowel -> String
 toHiraKanaChars Nothing c v = getHiraKana c v
 
 toHiraKanaChars (Just ConsonantS) ConsonantT v =
-  ["つぁ", "つぃ", "つ", "つぇ", "つぉ"] !! getVowelOrder v
+  ["つぁ", "つぃ", "つ", "つぇ", "つぉ"] !! fromEnum v
 
 toHiraKanaChars (Just ConsonantH) c v =
   case c of
-    ConsonantC -> ["ちゃ", "ち", "ちゅ", "ちぇ", "ちょ"] !! getVowelOrder v
-    ConsonantS -> ["しゃ", "し", "しゅ", "しぇ", "しょ"] !! getVowelOrder v
-    ConsonantW -> ["うぁ", "うぃ", "う", "うぇ", "うぉ"] !! getVowelOrder v
+    ConsonantC -> vowelIndex v ["ちゃ", "ち", "ちゅ", "ちぇ", "ちょ"]
+    ConsonantS -> vowelIndex v ["しゃ", "し", "しゅ", "しぇ", "しょ"]
+    ConsonantW -> vowelIndex v ["うぁ", "うぃ", "う", "うぇ", "うぉ"]
     ConsonantT -> 'て' : getHiraKana ConsonantLittleY v
     ConsonantD -> 'で' : getHiraKana ConsonantLittleY v
 
 toHiraKanaChars (Just ConsonantY) c v =
   case c of
-    ConsonantW -> ["うゃ", "ゐ", "うゅ", "ゑ", "うょ"] !! getVowelOrder v
+    ConsonantW -> vowelIndex v ["うゃ", "ゐ", "うゅ", "ゑ", "うょ"]
     ConsonantL -> getHiraKana ConsonantLittleY v
     ConsonantY -> getHiraKana ConsonantLittleY v
     ConsonantV -> 'ゔ' : getHiraKana ConsonantLittleY v
