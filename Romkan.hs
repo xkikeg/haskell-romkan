@@ -113,36 +113,36 @@ toHiraKanaChars (Just ConsonantY) c v =
 
 boin :: Parser Vowel
 boin = oneOf "aiueo" >>= f
-  where f c | c == 'a' = return VowelA
-            | c == 'i' = return VowelI
-            | c == 'u' = return VowelU
-            | c == 'e' = return VowelE
-            | c == 'o' = return VowelO
+  where f 'a' = return VowelA
+        f 'i' = return VowelI
+        f 'u' = return VowelU
+        f 'e' = return VowelE
+        f 'o' = return VowelO
 
 siin :: Parser Char
 siin = noneOf "aiueon"
 
 siinY :: Parser Consonant
 siinY = oneOf "bfghjklmprvz" >>= f
-  where f c | c == 'b' = return ConsonantB
-            | c == 'f' = return ConsonantF
-            | c == 'g' = return ConsonantG
-            | c == 'h' = return ConsonantH
-            | c == 'j' = return ConsonantJ
-            | c == 'k' = return ConsonantK
-            | c == 'l' = return ConsonantL
-            | c == 'm' = return ConsonantM
-            | c == 'p' = return ConsonantP
-            | c == 'r' = return ConsonantR
-            | c == 'v' = return ConsonantV
-            | c == 'z' = return ConsonantZ
+  where f 'b' = return ConsonantB
+        f 'f' = return ConsonantF
+        f 'g' = return ConsonantG
+        f 'h' = return ConsonantH
+        f 'j' = return ConsonantJ
+        f 'k' = return ConsonantK
+        f 'l' = return ConsonantL
+        f 'm' = return ConsonantM
+        f 'p' = return ConsonantP
+        f 'r' = return ConsonantR
+        f 'v' = return ConsonantV
+        f 'z' = return ConsonantZ
 
 siinYH :: Parser Consonant
 siinYH = oneOf "cdsw" >>= f
-  where f c | c == 'c' = return ConsonantC
-            | c == 'd' = return ConsonantD
-            | c == 's' = return ConsonantS
-            | c == 'w' = return ConsonantW
+  where f 'c' = return ConsonantC
+        f 'd' = return ConsonantD
+        f 's' = return ConsonantS
+        f 'w' = return ConsonantW
 
 siinYHS :: Parser Consonant
 siinYHS = char 't' >> return ConsonantT
