@@ -24,6 +24,7 @@ main = do
   myparseTest romaji_to_kana "naninuneno"
   myparseTest romaji_to_kana "koxnnichiwa"
   myparseTest romaji_to_kana "toukyoutokkyokyokakyoku"
+  myparseTest romaji_to_kana "dhisuizuapen"
   myparseTest romaji_to_kana "annan"
   myparseTest romaji_to_kana "antabaka"
   myparseTest romaji_to_kana "sapporo"
