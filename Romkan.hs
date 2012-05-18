@@ -189,11 +189,10 @@ romaji_char_wo_xtu =
 
 romaji_char :: Parser String
 romaji_char =
-  try (do
-          c <- siin
-          (lookAhead . char) c
-          ('っ' :) <$> romaji_char_wo_xtu
-      )
+  (try $ do
+      c <- siin
+      (lookAhead . char) c
+      ('っ' :) <$> romaji_char_wo_xtu)
   <|> romaji_char_wo_xtu
 
 
