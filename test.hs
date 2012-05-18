@@ -8,7 +8,7 @@ prod xs ys = concatMap (f ys) xs
 
 hirakanaTest :: [Consonant] -> [Vowel] -> String
 hirakanaTest cs vs = concatMap f $ prod cs vs
-  where f (c, v) = toHiraKanaChars Nothing c v
+  where f (c, v) = toHiraKanaChars c Nothing v
 
 allVowel = [VowelA, VowelI, VowelU, VowelE, VowelO]
 

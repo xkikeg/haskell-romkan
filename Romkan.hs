@@ -114,13 +114,13 @@ getHiraKana c v =
     ConsonantV -> vowelIndex v ["ゔぁ", "ゔぃ", "ゔ", "ゔぇ", "ゔぉ"]
     _ -> [vowelIndex v (listHiraKana !! getConsonantOrder c)]
 
-toHiraKanaChars :: Maybe Consonant -> Consonant -> Vowel -> String
-toHiraKanaChars Nothing c v = getHiraKana c v
+toHiraKanaChars :: Consonant -> Maybe Consonant -> Vowel -> String
+toHiraKanaChars c Nothing v = getHiraKana c v
 
-toHiraKanaChars (Just ConsonantS) ConsonantT v =
+toHiraKanaChars ConsonantT (Just ConsonantS) v =
   ["つぁ", "つぃ", "つ", "つぇ", "つぉ"] !! fromEnum v
 
-toHiraKanaChars (Just ConsonantH) c v =
+toHiraKanaChars c (Just ConsonantH) v =
   case c of
     ConsonantC -> vowelIndex v ["ちゃ", "ち", "ちゅ", "ちぇ", "ちょ"]
     ConsonantS -> vowelIndex v ["しゃ", "し", "しゅ", "しぇ", "しょ"]
@@ -128,7 +128,7 @@ toHiraKanaChars (Just ConsonantH) c v =
     ConsonantT -> 'て' : getHiraKana ConsonantLittleY v
     ConsonantD -> 'で' : getHiraKana ConsonantLittleY v
 
-toHiraKanaChars (Just ConsonantY) c v =
+toHiraKanaChars c (Just ConsonantY) v =
   case c of
     ConsonantW -> vowelIndex v ["うゃ", "ゐ", "うゅ", "ゑ", "うょ"]
     ConsonantL -> getHiraKana ConsonantLittleY v
@@ -165,44 +165,27 @@ optionYHS = optionYH <|> (char 's' >> return ConsonantS)
 
 romaji_char_wo_xtu :: Parser String
 romaji_char_wo_xtu =
-  (char 'y' >> (fmap $ toHiraKanaChars Nothing ConsonantY) boin)
+  (char 'y' >> (fmap $ toHiraKanaChars ConsonantY Nothing) boin)
   <|>
-  (char 'q' >> toHiraKanaChars Nothing ConsonantQ <$> boin)
+  (char 'q' >> toHiraKanaChars ConsonantQ Nothing <$> boin)
   <|>
-  do
-    c <- siinY
-    o <- optionMaybe optionY
-    toHiraKanaChars o c <$> boin
+  toHiraKanaChars <$> siinY <*> optionMaybe optionY <*> boin
   <|>
-  do
-    c <- siinYH
-    o <- optionMaybe optionYH
-    toHiraKanaChars o c <$> boin
+  toHiraKanaChars <$> siinYH <*> optionMaybe optionYH <*> boin
   <|>
-  do
-    c <- siinYHS
-    o <- optionMaybe optionYHS
-    toHiraKanaChars o c <$> boin
+  toHiraKanaChars <$> siinYHS <*> optionMaybe optionYHS <*> boin
   <|> 
-  do
-    char 'x'
-    (char 'n' >> return "ん")
-      <|> 
-      do
-        o <- optionMaybe optionY 
-        toHiraKanaChars o ConsonantX <$> boin
+  (char 'x' >>
+   ((char 'n' >> return "ん")
+    <|> toHiraKanaChars ConsonantX <$> optionMaybe optionY <*> boin))
   <|>
-  do
-    char 'n'
-    (char 'n' >> return "ん")
-      <|> (eof >> return "ん")
-      <|> (lookAhead (noneOf "aiueoyn") >> return "ん")
-      <|>
-      do
-        o <- optionMaybe optionY
-        toHiraKanaChars o ConsonantN <$> boin
+  (char 'n' >>
+   ((char 'n' >> return "ん")
+    <|> (eof >> return "ん")
+    <|> (lookAhead (noneOf "aiueoyn") >> return "ん")
+    <|> toHiraKanaChars ConsonantN <$> optionMaybe optionY <*> boin))
   <|>
-  toHiraKanaChars Nothing ConsonantNone <$> boin
+  toHiraKanaChars ConsonantNone Nothing <$> boin
 
 romaji_char :: Parser String
 romaji_char =
